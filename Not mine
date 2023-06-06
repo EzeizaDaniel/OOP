@@ -1,0 +1,722 @@
+#include <iostream>
+#include <typeinfo>
+#include <fstream>
+#include <string>
+#include <random>
+#include <ctime>
+using namespace std;
+ 
+class Exception : public std::exception
+{
+protected:
+    char* str;
+public:
+ 
+    Exception(const char* s)
+    {
+        if (str != nullptr)
+        {
+            str = new char[strlen(s) + 1];
+            if (str != 0)
+            {
+                strcpy_s(str, strlen(s) + 1, s);
+            }
+        }
+    }
+ 
+    Exception(const Exception& V)
+    {
+        if (V.str != nullptr)
+        {
+            str = new char[strlen(V.str) + 1];
+            if (str != 0)
+            {
+                strcpy_s(str, strlen(V.str) + 1, V.str);
+            }
+        }
+    }
+ 
+    ~Exception()
+    {
+        if (str != nullptr)
+            delete[] str;
+    }
+ 
+    virtual void print()
+    {
+        cout << "Exception:" <<  str;
+    }
+};
+ 
+class WrongSize : public Exception
+{
+protected:
+    int count;
+    int index;
+public:
+    WrongSize(int count, int index) : Exception("Going beyond the boundaries of  the object")
+    {
+        this->count = count;
+        this->index = index;
+    }
+ 
+    void print() const
+    {
+        cout << "Exception:" << str << "\nValid indexes lie in interval from 0 to " << count << "\nYou tried get:" << index << '\n';
+    }
+};
+ 
+class MemoryAllocationError : public Exception
+{
+public:
+    MemoryAllocationError() : Exception("MemoryAllocationError") { }
+ 
+    void print() const
+    {
+        cout << "Exception:" << str << '\n';
+    }
+};
+ 
+template <class T>
+class LinkedList;
+class Stadium;
+ 
+ 
+template <class T>
+class Node
+{
+public:
+ 
+    Node* next;
+    Node* prev;
+    T data;
+ 
+    Node(const T _data = T(), Node* _prev = nullptr, Node* _next = nullptr)
+    {
+        data = _data;
+        next = _next;
+        prev = _prev;
+    }
+ 
+    Node(const Node<T>& V)
+    {
+        next = V.next;
+        prev = V.prev;
+        data = V.data;
+    }
+ 
+    template <class T>
+    friend class LinkedList;
+ 
+    template <class T>
+    friend ostream& operator << (ostream& out, Node<T>& V);
+ 
+    template <class T>
+    friend istream& operator >>(istream& in, Node<T>& V);
+};
+ 
+template <class T>
+ostream& operator << (ostream& out, Node<T>& V)
+{
+    out << V.data;
+    return out;
+}
+ 
+template <class T>
+istream& operator >>(istream& in, Node<T>& V)
+{
+    in >> V.data;
+    return in;
+}
+ 
+template <class T>
+class LinkedList
+{
+private:
+ 
+    Node<T>* head;
+    Node<T>* tail;
+    int count;
+public:
+ 
+    //конструктор по умолчанию
+    LinkedList<T>()
+    {
+        head = nullptr;
+        tail = nullptr;
+        count = 0;
+    }
+ 
+    //конструктор принимающий узел
+    LinkedList<T>(const T data)
+    {
+        count = 1;
+        this->head = new Node<T>(data);
+        if (head == 0) throw MemoryAllocationError();
+        this->tail = this->head;
+    }
+ 
+    //конструтор принимающий ifstream
+    LinkedList(ifstream& in)
+    {
+        if (in)
+        {
+            int size;
+            in >> size;
+ 
+            for (int i = 0; i < size; ++i)
+            {
+                T x;
+                in >> x;
+                push_back(x);
+            }
+        }
+    }
+ 
+    LinkedList(const LinkedList<T>& list)
+    {
+        count = 0;
+        Node<T>* temp = list.head;
+        for (temp; temp != nullptr; temp = temp->next)
+        {
+            push_back(temp->data);
+        }
+    }
+ 
+    LinkedList& operator = (const LinkedList<T>& list)
+    {
+        if (this == &list) return *this;
+ 
+        count = 0;
+        Node<T>* temp = list.head;
+ 
+        for (temp; temp != nullptr; temp = temp->next)
+        {
+            push_back(temp->data);
+        }
+        return *this;
+    }
+ 
+    //метод считывания списка из файла
+    LinkedList<T>& load(ifstream& in)
+    {
+        if (in)
+        {
+            count = 0;
+            int size;
+            in >> size;
+ 
+            for (int i = 0; i < size; ++i)
+            {
+                T x;
+                in >> x;
+                push_back(x);
+            }
+        }
+        return *this;
+    }
+ 
+    //метод записи списка в файл
+    ofstream save(ofstream& out) const
+    {
+        if (out)
+        {
+            out << count << '\n';
+            for (Node<T>* temp = head; temp != nullptr; temp = temp->next)
+            {
+                out << temp->data << " ";
+            }
+        }
+        return out;
+    }
+ 
+    //геттер длины списка
+    int lenght()
+    {
+        return count;
+    }
+ 
+    //геттер головы списка
+    Node<T>* Head()
+    {
+        return head;
+    }
+ 
+    //геттер хвоста списка
+    Node<T>* Tail()
+    {
+        return tail;
+    }
+ 
+    //добавление элемета в конец списка
+    void push_back(const T& data)
+    {
+        if (head == nullptr)
+        {
+            head = new Node<T>(data);
+            if (head == 0) throw MemoryAllocationError();
+            tail = head;
+        }
+        else
+        {
+            tail->next = new Node<T>(data, tail);
+            if (tail->next == 0) throw MemoryAllocationError();
+            tail = tail->next;
+        }
+        count++;
+    }
+ 
+    //добавление элемета в начало списка
+    void push_front(const T& data)
+    {
+        if (head == nullptr)
+        {
+            head = new Node<T>(data);
+            if (head == 0) throw MemoryAllocationError();
+            tail = head;
+        }
+        else
+        {
+            head->prev = new Node<T>(data, nullptr, head);
+            if (head->prev == 0) throw MemoryAllocationError();
+            head = head->prev;
+        }
+        count++;
+    }
+ 
+    //вставка после i-го индекса
+    void InsertAfter(const T& data, int index)
+    {
+        if (index <= 0 && index > count) throw WrongSize(count, index);
+        else if (index == count || head == nullptr)
+        {
+            push_back(data);
+            return;
+        }
+        else
+        {
+            Node<T>* temp = head;
+            for (int i = 0; i < index && temp != nullptr; ++i, temp = temp->next);
+            temp->next = new Node<T>(data, temp, temp->next);
+ 
+            if (temp->next == 0) throw MemoryAllocationError();
+        }
+        count++;
+    }
+ 
+    //вставка до i-го индекса
+    void InsertBefore(const T& data, int index)
+    {
+        if (index <= 0 && index) throw WrongSize(count, index);
+        else if (index == 0 || head == nullptr)
+        {
+            push_front(data);
+            return;
+        }
+        else
+        {
+            Node<T>* temp = head;
+            for (int i = 0; i < index && temp != nullptr; ++i, temp = temp->next);
+            temp->prev = new Node<T>(data, temp->prev, temp);
+ 
+            if (temp->prev == 0) throw MemoryAllocationError();
+        }
+    }
+ 
+    //удаление элемента с конца
+    void pop_back()
+    {
+        if (head == nullptr)
+        {
+            cout << "List is empty";
+            return;
+        }
+        else
+        {
+            tail = tail->prev;
+            delete tail->next;
+            tail->next = nullptr;
+        }
+        count--;
+    }
+ 
+    //удаление элемента с начала
+    void pop_front()
+    {
+        if (head == nullptr)
+        {
+            cout << "List is empty";
+            return;
+        }
+        else
+        {
+            head = head->next;
+            delete head->prev;
+            head->prev = nullptr;
+        }
+        count--;
+    }
+ 
+    T operator()(int index)
+    {
+        if (index < 0 || index > count) throw WrongSize(count, index);
+        else
+        {
+            Node<T> temp = head;
+            for (int i = 0; i < index, temp != nullptr; ++i, temp->next);
+            return temp->data;
+        }
+    }
+ 
+    //удаление i-го элемента 
+    void remove(const int index)
+    {
+        if (head == nullptr)
+        {
+            cout << "List is empty";
+            return;
+        }
+        if (index < 0 || index > count) throw WrongSize(count, index);
+        else if (index == 0)
+        {
+            pop_front();
+            return;
+        }
+        else if (index == count - 1)
+        {
+            pop_back();
+            return;
+        }
+        else
+        {
+            Node<T>* temp = head;
+            for (int i = 0; i != index; ++i, temp = temp->next);
+ 
+            temp->prev->next = temp->next;
+            temp->next->prev = temp->prev;
+            delete temp;
+        }
+        count--;
+    }
+ 
+    int find(T& data)
+    {
+        if (head != nullptr) // ????
+        {
+            Node<T>* temp = head;
+            for (int i = 0; i < count && temp != nullptr; ++i, temp = temp->next)
+            {
+                if (temp->data == data)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+    }
+ 
+    int find(const char* data)
+    {
+        if (head != nullptr) // ????
+        {
+            Node<T>* temp = head;
+            for (int i = 0; i < count && temp != nullptr; ++i, temp = temp->next)
+            {
+                if (temp->data == data)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+    }
+ 
+    LinkedList<T> filter(T& data)
+    {
+        LinkedList<T> rez;
+        Node<T>* temp = head;
+ 
+        for (int i = 0; i < count, temp != nullptr; ++i, temp = temp->next)
+        {
+            if ((temp->data) <= data) rez.push_back(temp->data);
+        }
+ 
+        return rez;
+    }
+ 
+    LinkedList<T> filter(const int& data)
+    {
+        LinkedList<T> rez;
+        Node<T>* temp = head;
+ 
+        for (int i = 0; i < count, temp != nullptr; ++i, temp = temp->next)
+        {
+            if ((temp->data) <= data) rez.push_back(temp->data);
+        }
+ 
+        return rez;
+    }
+ 
+ 
+ 
+    void print() const
+    {
+        Node<T>* temp = head;
+        while (temp != nullptr)
+        {
+            cout << temp->data << " ";
+            temp = temp->next;
+        }
+        cout << '\n';
+    }
+ 
+    ~LinkedList()
+    {
+        for (int i = 0; i < count - 1; ++i)
+        {
+            pop_back();
+        }
+        delete head;
+        delete tail;
+    }
+ 
+    template <class T>
+    friend ostream& operator <<(ostream& out, LinkedList<T>& V);
+ 
+    template <class T>
+    friend istream& operator >>(istream& in, LinkedList<T>& V);
+};
+ 
+template <class T>
+ostream& operator <<(ostream& out, LinkedList<T>& V)
+{
+    if (typeid(out).name() == typeid(ofstream).name())
+    {
+        out << V.count << '\n';
+    }
+ 
+    for (Node<T>* temp = V.head; temp != nullptr; temp = temp->next)
+    {
+        out << temp->data << " ";
+    }
+ 
+    return out;
+}
+ 
+template <class T>
+istream& operator >> (istream& in, LinkedList<T>& V)
+{
+    in >> V.count;
+ 
+    for (int i = 0; i < V.count; ++i)
+    {
+        T x;
+        in >> x;
+        V.push_back(x);
+    }
+ 
+    return in;
+}
+ 
+class Stadium
+{
+private:
+    string titel;
+    string sport;
+    int capacity;
+    int year;
+    int count;
+public:
+ 
+    //конструкторы
+    Stadium(string _titel = " ", string _sport = " ", int _capacity = 10000, int _year = 2000, int _count = 1)
+    {
+        titel = _titel;
+        sport = _sport;
+        capacity = _capacity;
+        year = _year;
+        count = _count;
+    }
+ 
+    Stadium(const Stadium& S)
+    {
+        titel = S.titel;
+        sport = S.sport;
+        capacity = S.capacity;
+        year = S.year;
+        count = S.count;
+    }
+ 
+    //опрератор =
+    Stadium& operator = (const Stadium& S)
+    {
+        if (this == &S) return *this;;
+ 
+        titel = S.titel;
+        sport = S.sport;
+        capacity = S.capacity;
+        year = S.year;
+        count = S.count;
+ 
+        return *this;
+    }
+ 
+    //геттеры
+    string titel_() { return titel; }
+    string sport_() { return sport; }
+    int Capacity() { return capacity; }
+    int Year() { return year; }
+    int Count() { return count; }
+ 
+    //сеттеры
+    void SetTitel(string& _titel) { titel = _titel; }
+    void SetSport(string& _sport) { sport = _sport; }
+    void SetCapacity(int _capacity) { capacity = _capacity; }
+    void SetYear(int _year) { year = _year; }
+    void SetCount(int _count) { count = _count; }
+ 
+    friend bool operator >=(Stadium& s1, Stadium& s2);
+    friend bool operator <=(Stadium& s1, Stadium& s2);
+    friend bool operator >=(Stadium& s1, const int& s2);
+    friend bool operator <=(Stadium& s1, const int& s2);
+    friend bool operator == (Stadium& s1, Stadium& s2);
+    friend bool operator == (Stadium& s, const char* s2);
+    friend ostream& operator << (ostream& out, Stadium& s);
+    friend istream& operator >> (istream& in, Stadium& s);
+};
+ 
+bool operator >=(Stadium& s1, const int& s2)
+{
+    return s1.year >= s2;
+}
+ 
+bool operator <=(Stadium& s1, const int& s2)
+{
+    return s1.year <= s2;
+}
+ 
+bool operator >=(Stadium& s1, Stadium& s2)
+{
+    return (s1.year >= s2.year);
+}
+ 
+bool operator <=(Stadium& s1, Stadium& s2)
+{
+    return (s1.year <= s2.year);
+}
+ 
+bool operator == (Stadium& s1, Stadium& s2)
+{
+    return (s1.titel == s2.titel);
+}
+ 
+bool operator == (Stadium& s, const char* s2)
+{
+    return s.titel == s2;
+}
+ 
+ 
+ostream& operator << (ostream& out, Stadium& s)
+{
+    if (typeid(out).name() == typeid(ofstream).name())
+    {
+        out << s.titel << " " << s.sport << " " << s.capacity << " " << s.year << " " << s.count;
+    }
+    else
+    {
+        out << "Stadium title: " << s.titel << '\n'
+            << "Types of sport: " << s.sport << '\n'
+            << "Capacity: " << s.capacity << '\n'
+            << "Yeat of build: " << s.year << '\n'
+            << "Number of arenas: " << s.count << '\n';
+    }
+    return out;
+}
+ 
+istream& operator >> (istream& in, Stadium& s)
+{
+    in >> s.titel >> s.sport >> s.capacity >> s.year >> s.count;
+    return in;
+}
+ 
+ 
+string titel[] = { "Sokker", "NationalStadium", " Australia" , "ShahALm" , "GuangDong", "Luzhniki", "Nissan", "Mercedes", "Olimpic", "Dragan", "NoName" };
+string sport[] = { "football", "basketball", "volleyball", "tennis", "running", "jumping", "skiing", "cucling", "boxing", "swimming", "hockey", "allWinter", "allSummer", "all" };
+int main()
+{
+    srand(time(NULL));
+ 
+    LinkedList<int> A;
+    for (int i = 1; i <= 10; ++i)
+    {
+        A.push_front((i * 2 * 3));
+    }
+    A.print();
+ 
+ 
+    ofstream fout1("out.txt");
+    if (fout1)
+    {
+        fout1 << A;
+        fout1.close();
+    }
+ 
+    ifstream fin1("out.txt");
+    if (fin1)
+    {
+        LinkedList<int> B;
+        B.load(fin1);
+        cout << B;
+        fin1.close();
+    }
+ 
+    LinkedList <Stadium> stadium;
+    Stadium st;
+ 
+    for (int i = 0; i < 9; ++i)
+    {
+        Stadium temp(titel[i], sport[i + 1], rand() % 10000 + 10000, 1900 + rand() % 123, rand() % 5);
+        if (i == 1)
+        {
+            st = temp;
+        }
+        stadium.push_back(temp);
+    }
+ 
+    ofstream fout("aa.txt");
+    if (fout)
+    {
+        fout << stadium;
+        fout.close();
+    }
+ 
+    ifstream fin("aa.txt");
+    LinkedList <Stadium> list;
+    if (fin)
+    {
+        list.load(fin);
+        //cout << list;
+        fin.close();
+    }
+ 
+    cout << list.find("ShahALm") << '\n';
+ 
+ 
+    LinkedList<Stadium> listok = stadium.filter(2000);
+ 
+    ofstream out("testik.txt");
+    if (out)
+    {
+        out << listok;
+        out.close();
+    }
+ 
+    ofstream out1("test1.txt");
+    if (out1)
+    {
+        out1 << stadium;
+        out1.close();
+    }
+ 
+    return 0;
+}
