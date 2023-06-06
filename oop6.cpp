@@ -97,9 +97,9 @@ public:
 	//удалить первый/последний элемент и вернуть удаленное значение
 	virtual Element<T>* pop() = 0;
 	//добавить элемент в список
-	virtual Element<T>* push(T value) = 0;
-	virtual Element<T>* find(string s) = 0;
-	virtual Element<T>* find_r(T value, Element<T>* current = NULL) = 0;
+	virtual Element<T>* push(const T& value) = 0;
+	virtual Element<T>* find(const string& s) = 0;
+	virtual Element<T>* find_r(const T& value, Element<T>* current = NULL) = 0;
 	virtual void save(string fileName) {
 		ofstream fout(fileName);
 		Element<T>* el = head;
@@ -200,7 +200,7 @@ public:
 		LinkedList<T>::tail->next = NULL;
 	}
 
-	virtual Element<T>* push(T value)
+	virtual Element<T>* push(const T& value)
 	{
 		if (LinkedList<T>::head == NULL)
 		{
@@ -217,7 +217,7 @@ public:
 	}
 
 
-	virtual Element<T>* insert(T value, Element<T>* previous = NULL)
+	virtual Element<T>* insert(const T& value, Element<T>* previous = NULL)
 	{
 		if (previous == NULL || LinkedList<T>::tail == NULL) return push(value);
 		Element<T>* inserted = new Element<T>(value);
@@ -226,7 +226,7 @@ public:
 		LinkedList<T>::count++;
 		return inserted;
 	}
-	virtual Element<T>* find_r(T value, Element<T>* current = NULL)
+	virtual Element<T>* find_r(const T& value, Element<T>* current = NULL)
 	{
 		if (current == NULL)
 			current = LinkedList<T>::head;
@@ -238,7 +238,7 @@ public:
 			return NULL;
 	}
 
-	virtual Element<T>* find(string v) {
+	virtual Element<T>* find(const string& v) {
 		Element<T>* p = LinkedList<T>::head;
 		while (p != NULL)
 		{
@@ -251,7 +251,7 @@ public:
 		return NULL;
 	}
 	
-	virtual void filter(int wins, LinkedList<T>* f, bool is_greater = true) {
+	virtual void filter(const int& wins, LinkedList<T>* f, const bool& is_greater = true) {
 		Element<T>* p = LinkedList<T>::head;
 		while (p != NULL)
 		{
@@ -267,7 +267,7 @@ public:
 
 
 	}
-	virtual void filter_r(int wins, LinkedList<T>* f, bool is_greater = true) {
+	virtual void filter_r(const int& wins, LinkedList<T>* f, const bool& is_greater = true) {
 
 		Element<T>* p = LinkedList<T>::head;
 		if (f == NULL) return;
@@ -286,7 +286,7 @@ public:
 	}
 	
 
-	virtual Element<T>& operator[](int index)
+	virtual Element<T>& operator[](const int& index)
 	{
 
 		Element<T>* p = LinkedList<T>::head;
@@ -309,7 +309,7 @@ public:
 	DoubleLinkedStack<T>() : Stack<T>() {}
 	virtual ~DoubleLinkedStack() { cout << "\nDoubleLinkedStack destructor"; }
 
-	virtual Element<T>* push(T value)
+	virtual Element<T>* push(const T& value)
 	{
 		Element<T>* tail_before_push = tail;
 		Stack<T>::push(value);
@@ -342,7 +342,7 @@ public:
 		tail->next = NULL;
 
 	}
-	virtual Element<T>* insert(T value, Element<T>* previous = NULL)
+	virtual Element<T>* insert(const T& value, Element<T>* previous = NULL)
 	{
 		Element<T>* inserted = Stack<T>::insert(value, previous);
 		if (inserted != NULL)
@@ -381,7 +381,7 @@ private:
 	string city, name;
 	int wins, loses, draws, amount;
 public:
-	Team(string cityt, string namet, int winst, int losest, int drawst, int amountt) { city = cityt; name = namet; wins = winst; draws = drawst; amount = amountt; cout << "\nTeam constructor 1"; }
+	Team(const string& cityt,const string& namet,const int& winst,const int& losest,const int& drawst,const int& amountt) { city = cityt; name = namet; wins = winst; draws = drawst; amount = amountt; cout << "\nTeam constructor 1"; }
 	Team() { city = "City" + std::to_string(rand() % 10); name = "Name" + to_string(rand() % 10); wins = rand() % 100; draws = rand() % 100; amount = rand() % 100; cout << "\nTeam default constructor"; }
 	Team(const Team& m) { city = m.city; name = m.name; wins = m.wins; draws = m.draws; amount = m.amount; cout << "\nTeam copy constructor"; }
 	~Team() { cout << "\nTeam destructor"; }
@@ -396,17 +396,17 @@ public:
 			return true;
 		return false;
 	}
-	bool operator== (string n) {
+	bool operator== (const string& n) {
 		if (name == n)
 			return true;
 		return false;
 	}
-	bool operator >=(int n) {
+	bool operator >=(const int& n) {
 		if (wins >= n)
 			return true;
 		else return false;
 	}
-	bool operator <=(int n) {
+	bool operator <=(const int& n) {
 		if (wins <= n)
 			return true;
 		else return false;
