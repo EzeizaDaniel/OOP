@@ -1,6 +1,3 @@
-﻿// ConsoleApplication1.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
-
 #include <iostream>
 #include <fstream>
 #include <string> 
@@ -90,8 +87,6 @@ protected:
 	Element<T>* tail;
 	int count;
 public:
-	//переместить в protected
-
 
 	LinkedList()
 	{
@@ -137,7 +132,7 @@ public:
 	template<class T1>
 	friend ostream& operator<<(ostream& s, LinkedList<T1>& el);
 
-	//доработать деструктор
+	
 	virtual ~LinkedList()
 	{
 		cout << "\nLinkedList destructor";
