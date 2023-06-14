@@ -25,10 +25,10 @@ public:
 	friend class Stack<T>;
 	friend class DoubleLinkedStack<T>;
 	template<class T>
-	friend ostream& operator<<(ostream& s, LinkedList<T>& el);
+	friend ostream& operator<<(ostream& s, const LinkedList<T>& el);
 
 	template<class T1>
-	friend ostream& operator<<(ostream& s, DoubleLinkedStack<T1>& el);
+	friend ostream& operator<<(ostream& s, const DoubleLinkedStack<T1>& el);
 
 	Element(T data)
 	{
@@ -51,19 +51,19 @@ public:
 	}*/
 
 	template<class T1>
-	friend ostream& operator<<(ostream& s, Element<T1>& el);
-	Element<T>* getNext()
+	friend ostream& operator<<(ostream& s, const Element<T1>& el);
+	const Element<T>* getNext()
 	{
 		return next;
 	}
-	Element<T>* getPrev() {
+	const Element<T>* getPrev() {
 
 		return prev;
 	}
-	void setNext(Element <T>* value) {
+	void setNext(const Element <T>* value) {
 		next = value;
 	}
-	void  setPrev(Element <T>* value) {
+	void  setPrev(const Element <T>* value) {
 		prev = value;
 	}
 	T getInfo() {
@@ -72,7 +72,7 @@ public:
 };
 
 template<class T1>
-ostream& operator<<(ostream& s, Element<T1>& el)
+ostream& operator<<(ostream& s, const Element<T1>& el)
 { 
 	s << el.info;
 	return s;
@@ -151,7 +151,7 @@ public:
 };
 
 template<class T1>
-ostream& operator<<(ostream& s, LinkedList<T1>& el)
+ostream& operator<<(ostream& s, const LinkedList<T1>& el)
 {
 	for (Element<T1>* current = el.head; current != NULL; current = current->next)
 		s << *current << " ";
@@ -166,7 +166,7 @@ public:
 	virtual ~Stack() { cout << "\nStack destructor"; }
 
 	//удалить первый/последний элемент и вернуть удаленное значение
-	virtual Element<T>* pop()
+	override Element<T>* pop()
 	{ 
 		if (LinkedList<T>::tail == NULL) return NULL;
 
@@ -187,7 +187,7 @@ public:
 		return res; 
 	}
 
-	virtual void remove()
+	override void remove()
 	{
 		//using LinkedList<T>::tail;
 		
@@ -217,7 +217,7 @@ public:
 	}
 
 
-	virtual Element<T>* insert(const T& value, Element<T>* previous = NULL)
+	override Element<T>* insert(const T& value, Element<T>* previous = NULL)
 	{
 		if (previous == NULL || LinkedList<T>::tail == NULL) return push(value);
 		Element<T>* inserted = new Element<T>(value);
@@ -286,7 +286,7 @@ public:
 	}
 	
 
-	virtual Element<T>& operator[](const int& index)
+	override Element<T>& operator[](const int& index)
 	{
 
 		Element<T>* p = LinkedList<T>::head;
@@ -309,14 +309,14 @@ public:
 	DoubleLinkedStack<T>() : Stack<T>() {}
 	virtual ~DoubleLinkedStack() { cout << "\nDoubleLinkedStack destructor"; }
 
-	virtual Element<T>* push(const T& value)
+	override Element<T>* push(const T& value)
 	{
 		Element<T>* tail_before_push = tail;
 		Stack<T>::push(value);
 		tail->prev = tail_before_push;
 		return tail;
 	}
-	virtual Element<T>* pop()
+	override Element<T>* pop()
 	{
 		if (head == tail) return Stack<T>::pop();
 
@@ -329,7 +329,7 @@ public:
 		tail->next = NULL;
 		return res;
 	}
-	virtual void remove()
+	override void remove()
 	{
 
 
