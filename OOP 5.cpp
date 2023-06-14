@@ -6,14 +6,12 @@
 
 using namespace std;
 
-//Абстрактный класс исключений
 class Exception : public exception
 {
 protected:
 	char* str;
 public:
 
-	//Конструктор
 	Exception(const char* str_e)
 	{
 		while (true)
@@ -27,7 +25,6 @@ public:
 		str[strlen(str_e)] = '\0';
 	}
 
-	//Конструктор копий
 	Exception(const Exception& e)
 	{
 		str = new char[strlen(e.str) + 1];
@@ -35,8 +32,7 @@ public:
 			str[i] = e.str[i];
 		str[strlen(e.str)] = '\0';
 	}
-
-	//Деструктор
+	
 	~Exception()
 	{
 		delete[] str;
@@ -47,7 +43,6 @@ public:
 
 
 
-//Выход за границы массива
 class IndexOutOfBounds : public Exception
 {
 private:
@@ -78,7 +73,6 @@ public:
 
 };
 
-//Неправильные размеры матриц при каких-либо бинарных операциях
 class WrongDimensions : public Exception
 {
 private:
@@ -113,8 +107,6 @@ public:
 	}
 };
 
-
-//Неправильно указанные размеры матрицы
 class WrongSize : public WrongDimensions
 {
 private:
@@ -140,7 +132,6 @@ public:
 };
 
 
-//Ошибка выделения памяти(мой собственный)
 class bad_allocs :public Exception
 {
 public:
@@ -161,9 +152,9 @@ template<class T>
 class MyMatrix
 {
 private:
-	int width;		//Ширина
-	int height;		//Высота
-	T** arr;		//Матрица
+	int width;		
+	int height;		
+	T** arr;		
 
 public:
 	template<class T>
@@ -173,7 +164,6 @@ public:
 	friend istream& operator>>(istream& in, MyMatrix<T>& mymatrix);
 
 
-	//Конструктор чтения из файла
 	MyMatrix(ifstream& in)
 	{
 		in >> height;
@@ -195,7 +185,6 @@ public:
 
 	}
 
-	//Метод чтение матрицы из файла
 	MyMatrix& readf(ifstream& in)
 	{
 		in >> height;
@@ -218,7 +207,6 @@ public:
 		return *this;
 	}
 
-	//Конструктор принимающий размеры матрицы
 	MyMatrix(int width_s = 1, int height_s = 1)
 	{
 		if (height_s < 0 || width_s < 0)
@@ -228,7 +216,7 @@ public:
 		height = height_s;
 
 		arr = new T * [height];
-		if (arr == 0)					//Проверка на выделение памяти
+		if (arr == 0)					
 			throw bad_allocs();
 
 		for (int i = 0; i < height; i++)
@@ -239,7 +227,7 @@ public:
 		}
 	}
 
-	//Конструктор копий
+	
 	MyMatrix(MyMatrix<T>& M)
 	{
 		height = M.height;
@@ -261,7 +249,7 @@ public:
 		}
 	}
 
-	//Оператор =  (для матриц)
+
 	MyMatrix<T>& operator=(MyMatrix<T>& mymatrix)
 	{
 		if (&mymatrix == this)
@@ -288,17 +276,15 @@ public:
 	}
 
 
-	//Обращение по индексу
 	T& operator()(int h, int w)
 	{
-		if (h < 0 || w < 0 || h >= height || w >= width)	//Если вышли за рамки
-			throw IndexOutOfBounds(h, w, height, width);						//Генерируем исключение
+		if (h < 0 || w < 0 || h >= height || w >= width)	//Г…Г±Г«ГЁ ГўГ»ГёГ«ГЁ Г§Г  Г°Г Г¬ГЄГЁ
+			throw IndexOutOfBounds(h, w, height, width);						//ГѓГҐГ­ГҐГ°ГЁГ°ГіГҐГ¬ ГЁГ±ГЄГ«ГѕГ·ГҐГ­ГЁГҐ
 
 		return arr[h][w];
 	}
 
 
-	//Применение скалярной функции ко всем элементам матрицы
 	MyMatrix<T>& solve(T(*f)(T))
 	{
 		for (int i = 0; i < height; i++)
@@ -312,11 +298,10 @@ public:
 	}
 
 
-	//Сложение двух матриц
 	MyMatrix<T> operator+(MyMatrix<T>& matrix)
 	{
-		if (height != matrix.height || width != matrix.width)						//Если матрицы разных размеров
-			throw WrongDimensions(height, width, matrix.height, matrix.width);			//Генерируем исключение
+		if (height != matrix.height || width != matrix.width)						
+			throw WrongDimensions(height, width, matrix.height, matrix.width);			
 
 
 		MyMatrix<T> ans{ height,width };
@@ -332,7 +317,7 @@ public:
 		return ans;
 	}
 
-	//Заполнение рандомное
+	//Г‡Г ГЇГ®Г«Г­ГҐГ­ГЁГҐ Г°Г Г­Г¤Г®Г¬Г­Г®ГҐ
 	void fill()
 	{
 		for (int i = 0; i < height; i++)
@@ -344,7 +329,7 @@ public:
 		}
 	}
 
-	//Вывод матрицы
+	//Г‚Г»ГўГ®Г¤ Г¬Г ГІГ°ГЁГ¶Г»
 	void print()
 	{
 		for (int i = 0; i < height; i++)
@@ -359,7 +344,7 @@ public:
 	}
 
 
-	//Деструктор
+	//Г„ГҐГ±ГІГ°ГіГЄГІГ®Г°
 	~MyMatrix()
 	{
 		for (int i = 0; i < height; i++)
@@ -370,22 +355,22 @@ public:
 
 };
 
-//	Теоретически достаточно было бы дописать ещё один оператор вывода в файл(на практике не работает т.к. «за кулисами»
-//	производится преобразование между типами ostream / ofstream.)
+//	Г’ГҐГ®Г°ГҐГІГЁГ·ГҐГ±ГЄГЁ Г¤Г®Г±ГІГ ГІГ®Г·Г­Г® ГЎГ»Г«Г® ГЎГ» Г¤Г®ГЇГЁГ±Г ГІГј ГҐГ№Вё Г®Г¤ГЁГ­ Г®ГЇГҐГ°Г ГІГ®Г° ГўГ»ГўГ®Г¤Г  Гў ГґГ Г©Г«(Г­Г  ГЇГ°Г ГЄГІГЁГЄГҐ Г­ГҐ Г°Г ГЎГ®ГІГ ГҐГІ ГІ.ГЄ. В«Г§Г  ГЄГіГ«ГЁГ±Г Г¬ГЁВ»
+//	ГЇГ°Г®ГЁГ§ГўГ®Г¤ГЁГІГ±Гї ГЇГ°ГҐГ®ГЎГ°Г Г§Г®ГўГ Г­ГЁГҐ Г¬ГҐГ¦Г¤Гі ГІГЁГЇГ Г¬ГЁ ostream / ofstream.)
 // 
 //		friend ofstream& operator << (ofstream& ustream, Complex obj);
 
 
 //	class std::basic_ostream<char, struct	std::char_traits<char> >
-//	В случае ofstream :
+//	Г‚ Г±Г«ГіГ·Г ГҐ ofstream :
 //	class std::basic_ofstream<char, struct std::char_traits<char> >
 
 
-//Перегрузка оператора вывода  (для матриц)
+//ГЏГҐГ°ГҐГЈГ°ГіГ§ГЄГ  Г®ГЇГҐГ°Г ГІГ®Г°Г  ГўГ»ГўГ®Г¤Г   (Г¤Г«Гї Г¬Г ГІГ°ГЁГ¶)
 template<class T>
 ostream& operator << (ostream& out, MyMatrix<T>& mymatrix)
 {
-	//Проверка на вывод в файл
+	//ГЏГ°Г®ГўГҐГ°ГЄГ  Г­Г  ГўГ»ГўГ®Г¤ Гў ГґГ Г©Г«
 	if (typeid(out).name() == typeid(ofstream).name())
 	{
 		out << mymatrix.height << ' ' << mymatrix.width << '\n';
@@ -398,7 +383,7 @@ ostream& operator << (ostream& out, MyMatrix<T>& mymatrix)
 			}
 		}
 	}
-	else    //Вывод в консоль
+	else    //Г‚Г»ГўГ®Г¤ Гў ГЄГ®Г­Г±Г®Г«Гј
 	{
 		for (int i = 0; i < mymatrix.height; i++)
 		{
@@ -414,11 +399,11 @@ ostream& operator << (ostream& out, MyMatrix<T>& mymatrix)
 }
 
 
-//Перегрузка оператора ввода (для матриц)
+//ГЏГҐГ°ГҐГЈГ°ГіГ§ГЄГ  Г®ГЇГҐГ°Г ГІГ®Г°Г  ГўГўГ®Г¤Г  (Г¤Г«Гї Г¬Г ГІГ°ГЁГ¶)
 template<class T>
 istream& operator>>(istream& in, MyMatrix<T>& mymatrix)
 {
-	//Проверка на чтение из файла
+	//ГЏГ°Г®ГўГҐГ°ГЄГ  Г­Г  Г·ГІГҐГ­ГЁГҐ ГЁГ§ ГґГ Г©Г«Г 
 	if (typeid(in).name() == typeid(ifstream).name())
 		in >> mymatrix.height >> mymatrix.width;
 
@@ -452,18 +437,18 @@ int main()
 		}
 	}
 
-	//Записываем в файл 
+	//Г‡Г ГЇГЁГ±Г»ГўГ ГҐГ¬ Гў ГґГ Г©Г« 
 	ofstream fout;
 	fout.open("test.txt", ios::out);
-	if (fout)		//Если файл открылся и всё ок
+	if (fout)		//Г…Г±Г«ГЁ ГґГ Г©Г« Г®ГІГЄГ°Г»Г«Г±Гї ГЁ ГўГ±Вё Г®ГЄ
 	{
 		fout << z;
-		fout.close();	//Не забываем закрыть
+		fout.close();	//ГЌГҐ Г§Г ГЎГ»ГўГ ГҐГ¬ Г§Г ГЄГ°Г»ГІГј
 	}
 
-	//Считываем
+	//Г‘Г·ГЁГІГ»ГўГ ГҐГ¬
 	ifstream fin("test.txt");
-	if (fin)		//Елси файл открылся и всё ок
+	if (fin)		//Г…Г«Г±ГЁ ГґГ Г©Г« Г®ГІГЄГ°Г»Г«Г±Гї ГЁ ГўГ±Вё Г®ГЄ
 	{
 		try
 		{
@@ -471,7 +456,7 @@ int main()
 			matr2.readf(fin);
 			MyMatrix<double> matr{ fin };
 			fin >> z1;
-			fin.close();			//Закрыть
+			fin.close();			//Г‡Г ГЄГ°Г»ГІГј
 			cout << "\n" << matr2;
 		}
 		catch (...)
@@ -490,7 +475,7 @@ int main()
 	try
 	{
 		MyMatrix<double> wrong_matrix{ -2,0 };
-		//Здесь мы уже не будем
+		//Г‡Г¤ГҐГ±Гј Г¬Г» ГіГ¦ГҐ Г­ГҐ ГЎГіГ¤ГҐГ¬
 		wrong_matrix + matrix;
 	}
 	catch (WrongSize ws)
