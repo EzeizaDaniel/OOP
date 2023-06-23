@@ -276,7 +276,7 @@ public:
 	}
 
 
-	T& operator()(int h, int w)
+	T& operator()(const int& h, const int& w)
 	{
 		if (h < 0 || w < 0 || h >= height || w >= width)	//Åñëè âûøëè çà ðàìêè
 			throw IndexOutOfBounds(h, w, height, width);						//Ãåíåðèðóåì èñêëþ÷åíèå
@@ -298,7 +298,7 @@ public:
 	}
 
 
-	MyMatrix<T> operator+(MyMatrix<T>& matrix)
+	MyMatrix<T> operator+(const MyMatrix<T>& matrix)
 	{
 		if (height != matrix.height || width != matrix.width)						
 			throw WrongDimensions(height, width, matrix.height, matrix.width);			
@@ -317,7 +317,6 @@ public:
 		return ans;
 	}
 
-	//Çàïîëíåíèå ðàíäîìíîå
 	void fill()
 	{
 		for (int i = 0; i < height; i++)
@@ -329,7 +328,6 @@ public:
 		}
 	}
 
-	//Âûâîä ìàòðèöû
 	void print()
 	{
 		for (int i = 0; i < height; i++)
@@ -343,8 +341,6 @@ public:
 		cout << '\n';
 	}
 
-
-	//Äåñòðóêòîð
 	~MyMatrix()
 	{
 		for (int i = 0; i < height; i++)
@@ -355,22 +351,9 @@ public:
 
 };
 
-//	Òåîðåòè÷åñêè äîñòàòî÷íî áûëî áû äîïèñàòü åù¸ îäèí îïåðàòîð âûâîäà â ôàéë(íà ïðàêòèêå íå ðàáîòàåò ò.ê. «çà êóëèñàìè»
-//	ïðîèçâîäèòñÿ ïðåîáðàçîâàíèå ìåæäó òèïàìè ostream / ofstream.)
-// 
-//		friend ofstream& operator << (ofstream& ustream, Complex obj);
-
-
-//	class std::basic_ostream<char, struct	std::char_traits<char> >
-//	Â ñëó÷àå ofstream :
-//	class std::basic_ofstream<char, struct std::char_traits<char> >
-
-
-//Ïåðåãðóçêà îïåðàòîðà âûâîäà  (äëÿ ìàòðèö)
 template<class T>
-ostream& operator << (ostream& out, MyMatrix<T>& mymatrix)
+ostream& operator << (ostream& out, const MyMatrix<T>& mymatrix)
 {
-	//Ïðîâåðêà íà âûâîä â ôàéë
 	if (typeid(out).name() == typeid(ofstream).name())
 	{
 		out << mymatrix.height << ' ' << mymatrix.width << '\n';
@@ -383,7 +366,7 @@ ostream& operator << (ostream& out, MyMatrix<T>& mymatrix)
 			}
 		}
 	}
-	else    //Âûâîä â êîíñîëü
+	else   
 	{
 		for (int i = 0; i < mymatrix.height; i++)
 		{
@@ -398,12 +381,9 @@ ostream& operator << (ostream& out, MyMatrix<T>& mymatrix)
 	return out;
 }
 
-
-//Ïåðåãðóçêà îïåðàòîðà ââîäà (äëÿ ìàòðèö)
 template<class T>
 istream& operator>>(istream& in, MyMatrix<T>& mymatrix)
 {
-	//Ïðîâåðêà íà ÷òåíèå èç ôàéëà
 	if (typeid(in).name() == typeid(ifstream).name())
 		in >> mymatrix.height >> mymatrix.width;
 
@@ -436,19 +416,17 @@ int main()
 			z(i, g) = rand() % 19;
 		}
 	}
-
-	//Çàïèñûâàåì â ôàéë 
+	
 	ofstream fout;
 	fout.open("test.txt", ios::out);
-	if (fout)		//Åñëè ôàéë îòêðûëñÿ è âñ¸ îê
+	if (fout)	
 	{
 		fout << z;
-		fout.close();	//Íå çàáûâàåì çàêðûòü
+		fout.close();
 	}
 
-	//Ñ÷èòûâàåì
 	ifstream fin("test.txt");
-	if (fin)		//Åëñè ôàéë îòêðûëñÿ è âñ¸ îê
+	if (fin)		
 	{
 		try
 		{
