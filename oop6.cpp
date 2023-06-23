@@ -119,7 +119,7 @@ public:
 
 	friend class Stack<T>;
 	//доступ по индексу
-	virtual Element<T>& operator[](int index)
+	virtual Element<T>& operator[](const int& index)
 	{
 		//if (index < 0 || index >= LinkedList<T>::count)
 		//
@@ -130,7 +130,7 @@ public:
 	}
 
 	template<class T1>
-	friend ostream& operator<<(ostream& s, LinkedList<T1>& el);
+	friend ostream& operator<<(ostream& s, const LinkedList<T1>& el);
 
 	
 	virtual ~LinkedList()
@@ -200,7 +200,7 @@ public:
 		LinkedList<T>::tail->next = NULL;
 	}
 
-	virtual Element<T>* push(const T& value)
+	override Element<T>* push(const T& value)
 	{
 		if (LinkedList<T>::head == NULL)
 		{
@@ -217,7 +217,7 @@ public:
 	}
 
 
-	override Element<T>* insert(const T& value, Element<T>* previous = NULL)
+	virtual Element<T>* insert(const T& value, Element<T>* previous = NULL)
 	{
 		if (previous == NULL || LinkedList<T>::tail == NULL) return push(value);
 		Element<T>* inserted = new Element<T>(value);
@@ -226,7 +226,7 @@ public:
 		LinkedList<T>::count++;
 		return inserted;
 	}
-	virtual Element<T>* find_r(const T& value, Element<T>* current = NULL)
+	override Element<T>* find_r(const T& value, Element<T>* current = NULL)
 	{
 		if (current == NULL)
 			current = LinkedList<T>::head;
@@ -353,7 +353,7 @@ public:
 		return inserted;
 	}
 	template<class T1>
-	friend ostream& operator<<(ostream& s, DoubleLinkedStack<T1>& el);
+	friend ostream& operator<<(ostream& s, const DoubleLinkedStack<T1>& el);
 
 	void print(ostream& s)
 	{
@@ -363,7 +363,7 @@ public:
 };
 
 template<class T1>
-ostream& operator<<(ostream& s, DoubleLinkedStack<T1>& el)
+ostream& operator<<(ostream& s, const DoubleLinkedStack<T1>& el)
 {
 	Element<T1>* current = el.head;
 	for (; current->getNext() != NULL; current = current->getNext()) {
@@ -411,7 +411,7 @@ public:
 			return true;
 		else return false;
 	}
-	friend ostream& operator<<(ostream& s, Team& m) { s << m.name << " " << m.city << " " << m.wins << " " << m.loses << " " << m.draws << " " << m.amount << " "; return s; }
+	friend ostream& operator<<(ostream& s, const Team& m) { s << m.name << " " << m.city << " " << m.wins << " " << m.loses << " " << m.draws << " " << m.amount << " "; return s; }
 };
 
 
@@ -419,7 +419,7 @@ public:
 int main()
 {
 
-	DoubleLinkedStack<Team>* ptr = new DoubleLinkedStack<Team>;
+	/* DoubleLinkedStack<Team>* ptr = new DoubleLinkedStack<Team>;
 	for (int i = 0; i < 50; i += 10)
 		ptr->push(Team());
 	cout << "\n"; ptr->print(cout);
@@ -433,7 +433,7 @@ int main()
 	DoubleLinkedStack<Team>*ptr3 = new DoubleLinkedStack<Team>;
 	castedList->filter(10, ptr3, true);
 	cout << "\n\nFilter (>10 by wins): " << *ptr3 << "\n\n";
-	delete ptr;
+	delete ptr; */
 	//delete castedList;
 
 
