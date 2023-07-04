@@ -94,7 +94,7 @@ public:
 		;
 	}
 
-	virtual void print()
+	override void print() const
 	{
 		cout << "Exception: " << str << "  " << size_h1 << "X" << size_w1 << " and " << size_h2 << "X" << size_w2 << '\n';
 	}
@@ -284,6 +284,7 @@ public:
 
 	MyMatrix<T>& solve(T(*f)(T))
 	{
+		if (
 		for (int i = 0; i < height; i++)
 		{
 			for (int g = 0; g < width; g++)
@@ -325,7 +326,7 @@ public:
 		}
 	}
 
-	void print()
+	void print() const
 	{
 		for (int i = 0; i < height; i++)
 		{
@@ -340,10 +341,12 @@ public:
 
 	~MyMatrix()
 	{
+		if (arr != nullptr){
 		for (int i = 0; i < height; i++)
 			delete[] arr[i];
 
 		delete[] arr;
+		}
 	}
 
 };
