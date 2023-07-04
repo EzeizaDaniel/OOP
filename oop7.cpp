@@ -20,7 +20,7 @@ protected:
 	//переменная, необходимая для поддержания баланса дерева
 	int height;
 
-	virtual Node<T>* Min(Node<T>* current)
+	virtual Node<T>* Min(Node<T>* current) 
 	{
 		while (current->getLeft() != NULL)
 			current = current->getLeft();
@@ -66,17 +66,17 @@ public:
 	}
 
 
-	virtual void print()
+	virtual void print() const
 	{
 		cout << "\n" << data;
 	}
 
-	virtual void setHeight(int h)
+	virtual void setHeight(const int& h)
 	{
 		height = h;
 	}
 
-	template<class T> friend ostream& operator<< (ostream& stream, Node<T>& N);
+	template<class T> friend ostream& operator<< (ostream& stream, const Node<T>& N);
 
 	Node* successor()
 	{
@@ -120,7 +120,7 @@ public:
 };
 
 template<class T>
-ostream& operator<< (ostream& stream, Node<T>& N)
+ostream& operator<< (ostream& stream, const Node<T>& N)
 {
 	try {
 		stream << "\nNode data: " << N.data << ", height: " << N.height;
@@ -131,7 +131,7 @@ ostream& operator<< (ostream& stream, Node<T>& N)
 	return stream;
 }
 template<class T>
-void print(Node<T>* N) { cout << "\n" << N->getData(); }
+void print(Node<T>* N) const { cout << "\n" << N->getData(); }
 
 template<class T>
 class Tree
@@ -141,7 +141,7 @@ protected:
 	Node<T>* root;
 public:
 	//доступ к корневому элементу
-	virtual Node<T>* getRoot() { return root; }
+	virtual Node<T>* getRoot() const { return root; }
 
 	//конструктор дерева: в момент создания дерева ни одного узла нет, корень смотрит в никуда
 	Tree<T>() { root = NULL; }
