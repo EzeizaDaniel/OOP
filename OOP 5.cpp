@@ -28,9 +28,12 @@ public:
 	Exception(const Exception& e)
 	{
 		str = new char[strlen(e.str) + 1];
+		if (str != nullptr)
+		{
 		for (int i = 0; i < strlen(e.str); i++)
 			str[i] = e.str[i];
 		str[strlen(e.str)] = '\0';
+		}
 	}
 	
 	~Exception()
@@ -60,15 +63,10 @@ public:
 		sizew = size_w;
 	}
 
-	void print()
+	void print() const
 	{
 		cout << "Exception: " << str << '\n' << "Index: (" << indexh << "," << indexw << "), valid indexes : (0-" << sizeh << ",0-" << sizew << ") \n";
 
-	}
-
-	~IndexOutOfBounds()
-	{
-		;
 	}
 
 };
@@ -158,7 +156,7 @@ private:
 
 public:
 	template<class T>
-	friend ostream& operator << (ostream& out, MyMatrix<T>& mymatrix);
+	friend ostream& operator << (ostream& out, const MyMatrix<T>& mymatrix);
 
 	template<class T>
 	friend istream& operator>>(istream& in, MyMatrix<T>& mymatrix);
@@ -228,7 +226,7 @@ public:
 	}
 
 	
-	MyMatrix(MyMatrix<T>& M)
+	MyMatrix(const MyMatrix<T>& M)
 	{
 		height = M.height;
 		width = M.width;
@@ -250,7 +248,7 @@ public:
 	}
 
 
-	MyMatrix<T>& operator=(MyMatrix<T>& mymatrix)
+	MyMatrix<T>& operator=(const MyMatrix<T>& mymatrix)
 	{
 		if (&mymatrix == this)
 			return *this;
@@ -278,9 +276,8 @@ public:
 
 	T& operator()(const int& h, const int& w)
 	{
-		if (h < 0 || w < 0 || h >= height || w >= width)	//Åñëè âûøëè çà ðàìêè
-			throw IndexOutOfBounds(h, w, height, width);						//Ãåíåðèðóåì èñêëþ÷åíèå
-
+		if (h < 0 || w < 0 || h >= height || w >= width)	
+			throw IndexOutOfBounds(h, w, height, width);						
 		return arr[h][w];
 	}
 
@@ -434,7 +431,7 @@ int main()
 			matr2.readf(fin);
 			MyMatrix<double> matr{ fin };
 			fin >> z1;
-			fin.close();			//Çàêðûòü
+			fin.close();			
 			cout << "\n" << matr2;
 		}
 		catch (...)
@@ -453,7 +450,7 @@ int main()
 	try
 	{
 		MyMatrix<double> wrong_matrix{ -2,0 };
-		//Çäåñü ìû óæå íå áóäåì
+
 		wrong_matrix + matrix;
 	}
 	catch (WrongSize ws)
