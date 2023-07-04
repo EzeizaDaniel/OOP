@@ -1,0 +1,130 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+// Функция для считывания массива из файла
+template <typename T>
+std::vector<T> readArrayFromFile(const std::string& filename) {
+    std::ifstream file(filename);
+    std::vector<T> array;
+
+    if (file.is_open()) {
+        T value;
+        while (file >> value) {
+            array.push_back(value);
+        }
+        file.close();
+    } else {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+    }
+
+    return array;
+}
+
+// Функция для записи массива в файл
+template <typename T>
+void writeArrayToFile(const std::vector<T>& array, const std::string& filename) {
+    std::ofstream file(filename);
+
+    if (file.is_open()) {
+        for (const auto& value : array) {
+            file << value << " ";
+        }
+        file.close();
+    } else {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+    }
+}
+
+// Функция сортировки подсчетом
+template <typename T>
+void countingSort(std::vector<T>& array) {
+    if (array.empty()) {
+        return;
+    }
+
+    T maxElement = *std::max_element(array.begin(), array.end());
+    T minElement = *std::min_element(array.begin(), array.end());
+    int range = maxElement - minElement + 1;
+
+    std::vector<T> count(range, 0);
+    std::vector<T> sortedArray(array.size());
+
+    for (const auto& element : array) {
+        count[element - minElement]++;
+    }
+
+    for (int i = 1; i < range; ++i) {
+        count[i] += count[i - 1];
+    }
+
+    for (int i = array.size() - 1; i >= 0; --i) {
+        sortedArray[count[array[i] - minElement] - 1] = array[i];
+        count[array[i] - minElement]--;
+    }
+
+    array = sortedArray;
+}
+
+// Функция сортировки слиянием
+template <typename T>
+void mergeSort(std::vector<T>& array, int left, int right) {
+    if (left < right) {
+        int middle = left + (right - left) / 2;
+
+        mergeSort(array, left, middle);
+        mergeSort(array, middle + 1, right);
+
+        std::vector<T> mergedArray(right - left + 1);
+        int i = left;
+        int j = middle + 1;
+        int k = 0;
+
+        while (i <= middle && j <= right) {
+            if (array[i] <= array[j]) {
+                mergedArray[k] = array[i];
+                ++i;
+            } else {
+                mergedArray[k] = array[j];
+                ++j;
+            }
+            ++k;
+        }
+
+        while (i <= middle) {
+            mergedArray[k] = array[i];
+            ++i;
+            ++k;
+        }
+
+        while (j <= right) {
+            mergedArray[k] = array[j];
+            ++j;
+            ++k;
+        }
+
+        for (int x = 0; x < mergedArray.size(); ++x) {
+            array[left + x] = mergedArray[x];
+        }
+    }
+}
+
+int main() {
+    // Чтение массива из файла
+    std::vector<int> array = readArrayFromFile<int>("input.txt");
+
+    // Сортировка подсчетом
+    countingSort(array);
+
+    // Запись отсортированного массива в новый файл
+    writeArrayToFile(array, "counting_sorted.txt");
+
+    // Сортировка слиянием
+    mergeSort(array, 0, array.size() - 1);
+
+    // Запись отсортированного массива в новый файл
+    writeArrayToFile(array, "merge_sorted.txt");
+
+    return 0;
+}
