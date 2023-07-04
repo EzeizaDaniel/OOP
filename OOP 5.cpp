@@ -118,7 +118,7 @@ public:
 		size_w = sizew;
 	}
 
-	void print()
+	void print() const
 	{
 		cout << "Exception: " << str << "   you try to make (" << size_h << ") X (" << size_w << ") matrix\n";
 	}
@@ -139,7 +139,7 @@ public:
 		;
 	}
 
-	void print()
+	void print() const
 	{
 		cout << "Exception: " << str << '\n';
 	}
