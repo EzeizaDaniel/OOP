@@ -2,12 +2,12 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
+using namespace std;
 
-// Функция для считывания массива из файла
 template <typename T>
-std::vector<T> readArrayFromFile(const std::string& filename) {
-    std::ifstream file(filename);
-    std::vector<T> array;
+vector<T> readArrayFromFile(const string& filename) {
+    ifstream file(filename);
+    vector<T> array;
 
     if (file.is_open()) {
         T value;
@@ -16,7 +16,7 @@ std::vector<T> readArrayFromFile(const std::string& filename) {
         }
         file.close();
     } else {
-        std::cerr << "Unable to open file: " << filename << std::endl;
+        cerr << "Unable to open file: " << filename << endl;
     }
 
     return array;
@@ -24,8 +24,8 @@ std::vector<T> readArrayFromFile(const std::string& filename) {
 
 // Функция для записи массива в файл
 template <typename T>
-void writeArrayToFile(const std::vector<T>& array, const std::string& filename) {
-    std::ofstream file(filename);
+void writeArrayToFile(const vector<T>& array, const string& filename) {
+    ofstream file(filename);
 
     if (file.is_open()) {
         for (const auto& value : array) {
@@ -33,23 +33,23 @@ void writeArrayToFile(const std::vector<T>& array, const std::string& filename) 
         }
         file.close();
     } else {
-        std::cerr << "Unable to open file: " << filename << std::endl;
+        cerr << "Unable to open file: " << filename << endl;
     }
 }
 
 // Функция сортировки подсчетом
 template <typename T>
-void countingSort(std::vector<T>& array) {
+void countingSort(vector<T>& array) {
     if (array.empty()) {
         return;
     }
 
-    T maxElement = *std::max_element(array.begin(), array.end());
-    T minElement = *std::min_element(array.begin(), array.end());
+    T maxElement = *max_element(array.begin(), array.end());
+    T minElement = *min_element(array.begin(), array.end());
     int range = maxElement - minElement + 1;
 
-    std::vector<T> count(range, 0);
-    std::vector<T> sortedArray(array.size());
+    vector<T> count(range, 0);
+    vector<T> sortedArray(array.size());
 
     for (const auto& element : array) {
         count[element - minElement]++;
@@ -69,7 +69,7 @@ void countingSort(std::vector<T>& array) {
 
 // Функция сортировки слиянием
 template <typename T>
-void mergeSort(std::vector<T>& array, int left, int right) {
+void mergeSort(vector<T>& array, int left, int right) {
     if (left < right) {
         int middle = left + (right - left) / 2;
 
@@ -111,19 +111,14 @@ void mergeSort(std::vector<T>& array, int left, int right) {
 }
 
 int main() {
-    // Чтение массива из файла
     std::vector<int> array = readArrayFromFile<int>("input.txt");
 
-    // Сортировка подсчетом
     countingSort(array);
 
-    // Запись отсортированного массива в новый файл
     writeArrayToFile(array, "counting_sorted.txt");
 
-    // Сортировка слиянием
     mergeSort(array, 0, array.size() - 1);
 
-    // Запись отсортированного массива в новый файл
     writeArrayToFile(array, "merge_sorted.txt");
 
     return 0;
